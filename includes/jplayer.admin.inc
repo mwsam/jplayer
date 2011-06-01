@@ -38,6 +38,20 @@ function jplayer_settings_form() {
     '#default_value' => variable_get('jplayer_pause_others', FALSE),
   );
 
+  $form['options']['jplayer_protected'] = array(
+    '#title' => t('Protect audio files from direct downloads'),
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('jplayer_protected', FALSE),
+  );
+
+  $form['options']['jplayer_access_time'] = array(
+    '#title' => t('Access delay'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('jplayer_access_time', 5),
+    '#size' => 5,
+    '#description' => t('The number of seconds that a client will have access to download a protected file after it is requested by jPlayer'),
+  );
+
   $form = system_settings_form($form);
   $form['#validate'][] = 'jplayer_settings_form_validate';
   $form['#submit'][] = 'jplayer_settings_form_submit';
@@ -51,6 +65,14 @@ function jplayer_settings_form_validate($form, &$form_state) {
   $form_state['jplayer_version'] = jplayer_get_version($form_state['values']['jplayer_directory']);
   if (!$form_state['jplayer_version']) {
     form_error($form['jplayer_directory'], t('The directory specified does not seem to contain the jPlayer library. Check to make sure that the jquery.player.min.js file is located within this directory.'));
+  }
+
+  $time = $form_state['values']['jplayer_access_time'];
+  if ($form_state['values']['jplayer_protected'] && !is_numeric($time)) {
+    form_error($form['options']['jplayer_access_time'], t('Access time must be a value in seconds.'));
+  }
+  if (intval($time) < 0) {
+    form_error($form['options']['jplayer_access_time'], t('Access time must be at least 0 seconds.'));
   }
 }
 
