@@ -224,6 +224,7 @@ function jplayer_add($add = TRUE) {
       'swfPath' => base_path() . variable_get('jplayer_directory', 'sites/all/libraries/jplayer'),
       'autoPlay' => (int) variable_get('jplayer_autoplay', ''),
       'pauseOthers' => variable_get('jplayer_pause_others', FALSE),
+      'protected' => variable_get('jplayer_protected', ''),
     ));
     if ($add) {
       drupal_add_js($filepath);

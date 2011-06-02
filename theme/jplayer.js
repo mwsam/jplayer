@@ -63,23 +63,25 @@ Drupal.behaviors.jPlayer = function(context) {
       });
     }
 
-    // Ensure that only one jPlayer can play per page when the regular player
-    // is used.
     $(wrapper).find('a.jp-play').click(function() {
+      // Ensure that only one jPlayer can play per page when the regular player
+      // is used.
       Drupal.jPlayer.pauseOthers(wrapper, player);
 
-      // Generate the authorization URL to ping.
-      var time = new Date;
-      var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + base64_encode($(player).attr('rel')) + '/' + base64_encode(parseInt(time.getTime() / 1000).toString());
+      if (Drupal.settings.jPlayer.protected) {
+        // Generate the authorization URL to ping.
+        var time = new Date;
+        var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + base64_encode($(player).attr('rel')) + '/' + base64_encode(parseInt(time.getTime() / 1000).toString());
 
-      // Ping the authorization URL. We need to disable async so that this
-      // command finishes before thisandler returns.
-      $.ajax({
-        url: authorize_url,
-        async: false,
-      });
-      return false;
-    });
+        // Ping the authorization URL. We need to disable async so that this
+        // command finishes before thisandler returns.
+        $.ajax({
+          url: authorize_url,
+          async: false,
+        });
+        return false;
+      }
+    }
 
     // Actually initialize the player.
     $(player).jPlayer({
