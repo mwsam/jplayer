@@ -71,7 +71,7 @@ Drupal.behaviors.jPlayer = function(context) {
       if (Drupal.settings.jPlayer.protected) {
         // Generate the authorization URL to ping.
         var time = new Date;
-        var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + base64_encode($(player).attr('rel')) + '/' + base64_encode(parseInt(time.getTime() / 1000).toString());
+        var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + Drupal.jPlayer.base64Encode($(player).attr('rel')) + '/' + Drupal.jPlayer.base64Encode(parseInt(time.getTime() / 1000).toString());
 
         // Ping the authorization URL. We need to disable async so that this
         // command finishes before thisandler returns.
@@ -195,7 +195,7 @@ Drupal.jPlayer.base64Encode = function(data) {
       return data;
   }
 
-  data = utf8_encode(data + '');
+  data = Drupal.jPlayer.utf8Encode(data + '');
 
   do { // pack three octets into four hexets
       o1 = data.charCodeAt(i++);
@@ -227,7 +227,7 @@ Drupal.jPlayer.base64Encode = function(data) {
   return enc;
 };
 
-Drupal.jPlayer.utf8_encode = function(argString) {
+Drupal.jPlayer.utf8Encode = function(argString) {
   // From http://phpjs.org/functions/utf8_encode:577 where it is dual-licensed
   // under GPL/MIT.
   // http://kevin.vanzonneveld.net
