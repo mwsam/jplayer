@@ -23,7 +23,116 @@ function jplayer_menu() {
     'file' => 'includes/jplayer.admin.inc',
   );
 
+  $items['jplayer/authorize'] = array(
+    'title' => 'jPlayer content authorization',
+    'page callback' => 'jplayer_authorize',
+    'access arguments' => array('access content'),
+    'description' => 'jPlayer callback to authorize a sound file to be accessed.',
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
+}
+
+/**
+ * Menu callback to authorize access to a file.
+ */
+function jplayer_authorize($filepath, $timestamp) {
+  $filepath = base64_decode($filepath);
+  $timestamp = base64_decode($timestamp);
+
+  if (!isset($_SESSION['jplayer_protect'])) {
+    $_SESSION['jplayer_protect'] = array();
+  }
+  $_SESSION['jplayer_protect'] = array();
+
+  $_SESSION['jplayer_protect'][$filepath] = (int)$timestamp;
+
+  drupal_json(TRUE);
+}
+
+/**
+ * Implementation of hook_file_download().
+ */
+function jplayer_file_download($filepath) {
+  if (!variable_get('jplayer_protected', FALSE)) {
+    return NULL;
+  }
+
+  // We need to determine if we are responsible for this file.
+  $filepath = file_create_path($filepath);
+  $result = db_query("SELECT * FROM {files} WHERE filepath = '%s'", $filepath);
+
+  // Ensure case-sensitivity of uploaded file names.
+  while ($file = db_fetch_object($result)) {
+    if (strcmp($file->filepath, $filepath) == 0) {
+      break;
+    }
+  }
+
+  // If the file is not found in the database, we're not responsible for it.
+  if (empty($file)) {
+    return NULL;
+  }
+
+  // Find out if any file field contains this file, and if so, which field
+  // and node it belongs to. Required for later access checking.
+  $cck_files = array();
+  foreach (content_fields() as $field) {
+    if ($field['type'] == 'filefield' || $field['type'] == 'image') {
+      $db_info = content_database_info($field);
+      $table = $db_info['table'];
+      $fid_column = $db_info['columns']['fid']['column'];
+
+      $columns = array('vid', 'nid');
+      foreach ($db_info['columns'] as $property_name => $column_info) {
+        $columns[] = $column_info['column'] .' AS '. $property_name;
+      }
+      $result = db_query("SELECT ". implode(', ', $columns) ."
+                          FROM {". $table ."}
+                          WHERE ". $fid_column ." = %d", $file->fid);
+
+      while ($content = db_fetch_array($result)) {
+        $content['field'] = $field;
+        $cck_files[$field['field_name']][$content['vid']] = $content;
+      }
+    }
+  }
+
+  // If any of the displays for this field are for jPlayer, then we need to
+  // protect the file.
+  foreach ($cck_files as $field_name => $field_files) {
+    foreach ($field_files as $revision_id => $content) {
+      $teaser_format = $content['field']['display_settings']['teaser']['format'];
+      $full_format = $content['field']['display_settings']['full']['format'];
+      // Neither the teaser or the full formatter for this field is a jPlayer
+      // display.
+      if (!($teaser_format == 'single' || $teaser_format == 'playlist' || $full_format == 'single' || $full_format == 'playlist')) {
+        return NULL;
+      }
+    }
+  }
+
+  // We need to figure out how the browser would have URL-encoded the file
+  // name.
+  $encoded = str_replace($file->filename, rawurlencode($file->filename), $filepath);
+  $encoded = str_replace('sites/default/files', 'system/files', $encoded);
+  // For some reason ampersands are encoded twice by the browser.
+  $encoded = str_replace("%26", "%2526", $encoded);
+  $started = (int)$_SESSION['jplayer_protect'][$GLOBALS['base_url'] . '/' . $encoded];
+
+  // Now we know that content protection is enabled, at least one display for
+  // the field uses jPlayer, and we know when the player last started to access
+  // the file.
+  if ($started) {
+    if (time() <= $started + variable_get('jplayer_access_time', 5)) {
+      // Allow access.
+      return NULL;
+    }
+  }
+
+  // Otherwise, deny access as the last played time is too far in the past.
+  return -1;
 }
 
 /**
