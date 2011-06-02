@@ -143,31 +143,31 @@ Drupal.jPlayer.play = function(wrapper, player) {
   Drupal.jPlayer.pauseOthers(wrapper, player);
   $(player).jPlayer('play');
   Drupal.jPlayer.active = true;
-}
+};
 
 Drupal.jPlayer.pause = function(wrapper, player) {
   $(player).jPlayer('pause');
   Drupal.jPlayer.active = false;
-}
+};
 
 Drupal.jPlayer.stop = function(wrapper, player) {
   $(player).jPlayer('stop');
   Drupal.jPlayer.active = false;
-}
+};
 
 Drupal.jPlayer.next = function(wrapper, player, playlist, current) {
   var index = (current + 1 < playlist.length) ? current + 1 : 0;
   Drupal.jPlayer.setActive(wrapper, player, playlist, index);
   Drupal.jPlayer.play(wrapper, player);
   return index;
-}
+};
 
 Drupal.jPlayer.previous = function(wrapper, player, playlist, current) {
   var index = (current - 1 >= 0) ? current - 1 : playlist.length - 1;
   Drupal.jPlayer.setActive(wrapper, player, playlist, index);
   Drupal.jPlayer.play(wrapper, player);
   return index;
-}
+};
 
 Drupal.jPlayer.base64Encode = function(data) {
   // From http://phpjs.org/functions/base64_encode:358 where it is
