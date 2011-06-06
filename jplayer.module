@@ -39,16 +39,17 @@ function jplayer_menu() {
  */
 function jplayer_authorize($filepath, $timestamp) {
   $filepath = base64_decode($filepath);
-  $timestamp = base64_decode($timestamp);
+  $timestamp = (int)base64_decode($timestamp);
 
   if (!isset($_SESSION['jplayer_protect'])) {
     $_SESSION['jplayer_protect'] = array();
   }
-  $_SESSION['jplayer_protect'] = array();
 
-  $_SESSION['jplayer_protect'][$filepath] = (int)$timestamp;
+  if ($timestamp < (time() + variable_get('jplayer_access_time', 5))) {
+    $_SESSION['jplayer_protect'][$filepath] = $timestamp;
+  }
 
-  drupal_json(TRUE);
+  drupal_json(time() + variable_get('jplayer_access_time', 5));
 }
 
 /**
@@ -125,7 +126,7 @@ function jplayer_file_download($filepath) {
   // the field uses jPlayer, and we know when the player last started to access
   // the file.
   if ($started) {
-    if (time() <= $started + variable_get('jplayer_access_time', 5)) {
+    if (time() <= ($started + variable_get('jplayer_access_time', 5))) {
       // Allow access.
       return NULL;
     }
