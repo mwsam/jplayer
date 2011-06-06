@@ -89,6 +89,9 @@ Drupal.behaviors.jPlayer = function(context) {
           Drupal.jPlayer.setActive(wrapper, player, playlist, active);
         }
         if (Drupal.settings.jPlayer.autoPlay && !Drupal.jPlayer.active) {
+          if (Drupal.settings.jPlayer.protected) {
+            Drupal.jPlayer.authorize(wrapper, player);
+          }
           Drupal.jPlayer.play(wrapper, player);
         }
       },
