@@ -31,6 +31,9 @@ Drupal.behaviors.jPlayer = function(context) {
         $(this).click(function() {
           active = n;
           Drupal.jPlayer.setActive(wrapper, player, playlist, n);
+          if (Drupal.settings.jPlayer.protected) {
+            Drupal.jPlayer.authorize(wrapper, player);
+          }
           Drupal.jPlayer.play(wrapper, player);
           return false;
         });
@@ -38,6 +41,9 @@ Drupal.behaviors.jPlayer = function(context) {
 
       // Enable play, pause, and stop buttons.
       $(wrapper).find('a.jp-play').click(function() {
+        if (Drupal.settings.jPlayer.protected) {
+          Drupal.jPlayer.authorize(wrapper, player);
+        }
         Drupal.jPlayer.play(wrapper, player);
         return false;
       });
@@ -69,35 +75,8 @@ Drupal.behaviors.jPlayer = function(context) {
       Drupal.jPlayer.pauseOthers(wrapper, player);
 
       // Handle pinging the authorization URL if needed.
-      if (Drupal.settings.jPlayer.protected) {
-        // Generate the authorization URL to ping.
-        var time = new Date();
-        var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + Drupal.jPlayer.base64Encode($(player).attr('rel')) + '/' + Drupal.jPlayer.base64Encode(parseInt(time.getTime() / 1000).toString());
-
-        // Ping the authorization URL. We need to disable async so that this
-        // command finishes before thisandler returns.
-        $.ajax({
-          url: authorize_url,
-          success: function(data) {
-            // Check to see if the access has expired. This could happen due to
-            // clock sync differences between the server and the client.
-            var seconds = parseInt(data);
-            var expires = new Date(seconds * 1000);
-            if ($('#jplayer-message').size() == 0) {
-              $(wrapper).parent().prepend('<div id="jplayer-message" class="messages error"></div>');
-              $('#jplayer-message').hide();
-            }
-            if (expires < time) {
-              var message = Drupal.t('There was an error downloading the audio. Try <a href="@url">reloading the page</a>. If the error persists, check that your computer\'s clock is accurate.', {"@url" : window.location});
-              $('#jplayer-message').fadeOut('fast').html("<ul><li>" + message + "</li></ul>").fadeIn('fast');
-              $(wrapper).hide();
-            }
-            else {
-              $('#jplayer-message').fadeOut('fast');
-            }
-          },
-          async: false,
-        });
+      if (playerType != 'playlist' && Drupal.settings.jPlayer.protected) {
+        Drupal.jPlayer.authorize(wrapper, player);
         return false;
       }
     }
@@ -188,6 +167,42 @@ Drupal.jPlayer.previous = function(wrapper, player, playlist, current) {
   Drupal.jPlayer.setActive(wrapper, player, playlist, index);
   Drupal.jPlayer.play(wrapper, player);
   return index;
+};
+
+/**
+ * Ping the authorization URL to gain access to protected files.
+ */
+Drupal.jPlayer.authorize = function(wrapper, player) {
+  // Generate the authorization URL to ping.
+  var time = new Date();
+  var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + Drupal.jPlayer.base64Encode($(player).attr('rel')) + '/' + Drupal.jPlayer.base64Encode(parseInt(time.getTime() / 1000).toString());
+
+  // Ping the authorization URL. We need to disable async so that this
+  // command finishes before thisandler returns.
+
+  $.ajax({
+    url: authorize_url,
+    success: function(data) {
+      // Check to see if the access has expired. This could happen due to
+      // clock sync differences between the server and the client.
+      var seconds = parseInt(data);
+      var expires = new Date(seconds * 1000);
+      if ($('#jplayer-message').size() == 0) {
+        $(wrapper).parent().prepend('<div id="jplayer-message" class="messages error"></div>');
+        $('#jplayer-message').hide();
+      }
+      if (expires < time) {
+        var message = Drupal.t('There was an error downloading the audio. Try <a href="@url">reloading the page</a>. If the error persists, check that your computer\'s clock is accurate.', {"@url" : window.location});
+        $('#jplayer-message').fadeOut('fast').html("<ul><li>" + message + "</li></ul>").fadeIn('fast');
+        $(wrapper).hide();
+      }
+      else {
+        $('#jplayer-message').fadeOut('fast');
+      }
+    },
+    async: false,
+  });
+  return false;
 };
 
 Drupal.jPlayer.base64Encode = function(data) {
