@@ -45,11 +45,11 @@ function jplayer_authorize($filepath, $timestamp) {
     $_SESSION['jplayer_protect'] = array();
   }
 
-  if ($timestamp < (time() + variable_get('jplayer_access_time', 5))) {
+  if ($timestamp < (time() + variable_get('jplayer_access_time', 30))) {
     $_SESSION['jplayer_protect'][$filepath] = $timestamp;
   }
 
-  drupal_json(time() + variable_get('jplayer_access_time', 5));
+  drupal_json(time() + variable_get('jplayer_access_time', 30));
 }
 
 /**
@@ -126,8 +126,8 @@ function jplayer_file_download($filepath) {
   // the field uses jPlayer, and we know when the player last started to access
   // the file.
   if ($started) {
-    if (time() <= ($started + variable_get('jplayer_access_time', 5))) {
-      // Allow access.
+    if (time() <= ($started + variable_get('jplayer_access_time', 30))) {
+      // Allow access, and immediately expire access to the file.
       return NULL;
     }
   }
