@@ -24,7 +24,7 @@ Drupal.behaviors.jPlayer = function(context) {
 
       // Enable clicking links within the playlist.
       $(wrapper).find('.jp-playlist li a').each(function(n) {
-        if ($(player).attr('rel') == '') {
+        if ($(player).attr('rel') == '' || $(player).attr('rel') == undefined) {
           $(player).attr('rel', this.href);
         }
         playlist.push(this);
