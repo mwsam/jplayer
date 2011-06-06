@@ -77,7 +77,7 @@ Drupal.behaviors.jPlayer = function(context) {
       swfPath: Drupal.settings.jPlayer.swfPath,
       volume: 50,
       oggSupport: false,
-      nativeSupprt: true
+      nativeSupport: true
     })
     // Set all our custom IDs.
     .jPlayer('cssId', 'play', playerId + '-play')
