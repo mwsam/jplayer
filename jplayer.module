@@ -120,7 +120,10 @@ function jplayer_file_download($filepath) {
   $encoded = str_replace('sites/default/files', 'system/files', $encoded);
   // For some reason ampersands are encoded twice by the browser.
   $encoded = str_replace("%26", "%2526", $encoded);
-  $started = (int)$_SESSION['jplayer_protect'][$GLOBALS['base_url'] . '/' . $encoded];
+  $access_key = $GLOBALS['base_url'] . '/' . $encoded;
+  if (isset($_SESSION['jplayer_protect'][$access_key])) {
+    $started = (int)$_SESSION['jplayer_protect'][$access_key];
+  }
 
   // Now we know that content protection is enabled, at least one display for
   // the field uses jPlayer, and we know when the player last started to access
@@ -128,6 +131,7 @@ function jplayer_file_download($filepath) {
   if ($started) {
     if (time() <= ($started + variable_get('jplayer_access_time', 30))) {
       // Allow access, and immediately expire access to the file.
+      unset($_SESSION['jplayer_protect'][$access_key]);
       return NULL;
     }
   }

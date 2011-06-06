@@ -68,6 +68,7 @@ Drupal.behaviors.jPlayer = function(context) {
       // is used.
       Drupal.jPlayer.pauseOthers(wrapper, player);
 
+      // Handle pinging the authorization URL if needed.
       if (Drupal.settings.jPlayer.protected) {
         // Generate the authorization URL to ping.
         var time = new Date();
