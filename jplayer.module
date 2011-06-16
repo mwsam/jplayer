@@ -23,6 +23,15 @@ function jplayer_menu() {
     'file' => 'includes/jplayer.admin.inc',
   );
 
+  $items['admin/reports/jplayer'] = array(
+    'title' => 'jPlayer content protection statistics',
+    'page callback' => 'jplayer_protection_statistics',
+    'access arguments' => array('access site reports'),
+    'description' => 'View statistics related to content protection for jPlayer.',
+    'file' => 'jplayer.admin.inc',
+    'file path' => drupal_get_path('module', 'jplayer') . '/includes',
+  );
+
   $items['jplayer/authorize'] = array(
     'title' => 'jPlayer content authorization',
     'page callback' => 'jplayer_authorize',
