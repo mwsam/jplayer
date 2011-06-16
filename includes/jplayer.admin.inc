@@ -38,25 +38,23 @@ function jplayer_settings_form() {
     '#default_value' => variable_get('jplayer_pause_others', FALSE),
   );
 
-  if (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PRIVATE) {
-    $form['options']['jplayer_protected'] = array(
-      '#title' => t('Protect audio files from direct downloads'),
-      '#type' => 'checkbox',
-      '#default_value' => variable_get('jplayer_protected', FALSE),
-    );
-    $form['options']['jplayer_access_time'] = array(
-      '#title' => t('Access delay'),
-      '#type' => 'textfield',
-      '#default_value' => variable_get('jplayer_access_time', 30),
-      '#size' => 5,
-      '#description' => t('The number of seconds that a client will have access to download a protected file after it is requested by jPlayer.'),
-    );
+  $form['options']['jplayer_protected'] = array(
+    '#title' => t('Protect audio files from direct downloads'),
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('jplayer_protected', FALSE),
+  );
+
+  if (variable_get('file_downloads', FILE_DOWNLOADS_PUBLIC) == FILE_DOWNLOADS_PUBLIC) {
+    $form['options']['jplayer_protected']['#description'] = t('To enable file download protection, first <a href="@file-system-settings">set the site download method to Private</a>.', array('@file-system-settings' => url('admin/settings/file-system', array('query' => drupal_get_destination()))));
   }
-  else {
-    $form['options']['jplayer_protected'] = array(
-      '#value' => t('To enable file download protection, first <a href="@file-system-settings">set the site download method to Private</a>.', array('@file-system-settings' => url('admin/settings/file-system', array('query' => drupal_get_destination())))),
-    );
-  }
+
+  $form['options']['jplayer_access_time'] = array(
+    '#title' => t('Access delay'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('jplayer_access_time', 30),
+    '#size' => 5,
+    '#description' => t('The number of seconds that a client will have access to download a protected file after it is requested by jPlayer.'),
+  );
 
   $form = system_settings_form($form);
   $form['#validate'][] = 'jplayer_settings_form_validate';
