@@ -53,6 +53,14 @@ function jplayer_authorize($filepath, $timestamp) {
 }
 
 /**
+ * Implementation of hook_cron().
+ */
+function jplayer_cron() {
+  // Delete records older than a week.
+  db_query("DELETE FROM {jplayer_denied} WHERE timestamp < %d", time() - 604800);
+}
+
+/**
  * Implementation of hook_file_download().
  */
 function jplayer_file_download($filepath) {
@@ -141,6 +149,12 @@ function jplayer_file_download($filepath) {
   }
 
   // Otherwise, deny access as the last played time is too far in the past.
+  $denied = new stdClass();
+  $denied->uid = $GLOBALS['user']->uid;
+  $denied->fid = $file->fid;
+  $denied->hostname = ip_address();
+  $denied->timestamp = time();
+  drupal_write_record('jplayer_denied', $denied);
   return -1;
 }
 
