@@ -24,7 +24,7 @@ function template_preprocess_jplayer_single(&$vars) {
     'url' => file_create_url($vars['element']['#item']['filepath']),
     'label' => !empty($vars['element']['#item']['data']['description']) ? $vars['element']['#item']['data']['description'] : $vars['element']['#item']['filename'],
   );
-  $vars['player_id'] = 'jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']) . '-' . $vars['element']['#item']['#delta'];
+  $vars['player_id'] = _jplayer_check_id('jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']) . '-' . $vars['element']['#item']['#delta']);
 
 }
 
@@ -65,7 +65,8 @@ function template_preprocess_jplayer_playlist(&$vars) {
     );
     $number++;
   }
-  $vars['player_id'] = 'jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']);
+
+  $vars['player_id'] = _jplayer_check_id('jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']));
 }
 
 /**
@@ -93,5 +94,36 @@ function template_preprocess_jplayer_view_playlist(&$vars) {
   }
 
   $vars['mode'] = 'playlist';
-  $vars['player_id'] = 'jplayer-view-' . str_replace('_', '-', $vars['view']->name);
+  $vars['player_id'] = _jplayer_check_id('jplayer-view-' . str_replace('_', '-', $vars['view']->name));
 }
+
+/**
+ * Return a unique ID for a jPlayer. This allows multiple embedded jPlayers to
+ * point to an identical file on the same page.
+ *
+ * @param $id
+ *   The ID to check for uniqueness.
+ *
+ * @return
+ *   A modified ID if the ID was not unique, or the same ID passed in if it was
+ *   unique.
+ */
+function _jplayer_check_id($id) {
+  // We keep track of player IDs generated per request. This ensures that if a
+  // player pointing to the same field is shown multiple times on a page, that
+  // each player gets a unique ID. This is especially a problem when jPlayers
+  // are embedded in hidden content such as View rendered with Quicktabs.
+  static $player_ids = array();
+
+  // Store a count of the number of times a unique ID is used, and make it
+  // unique if needed.
+  if (isset($player_ids[$id])) {
+    $id = $id . '-' . $player_ids[$id]++;
+  }
+  else {
+    $player_ids[$id] = 0;
+  }
+
+  return $id;
+}
+
