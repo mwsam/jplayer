@@ -67,10 +67,10 @@ Drupal.behaviors.jPlayer = function(context) {
     $(player).jPlayer({
       ready: function() { 
         this.element.jPlayer('setFile', this.element.attr('rel'));
+        if (player.playerType == 'playlist') {
+          Drupal.jPlayer.setActive(wrapper, player, playlist, active);
+        }
         if (Drupal.settings.jPlayer.autoPlay && !Drupal.jPlayer.active) {
-          if (playerType == 'playlist') {
-            Drupal.jPlayer.setActive(wrapper, player, playlist, active);
-          }
           Drupal.jPlayer.play(wrapper, player);
         }
       },
