@@ -215,7 +215,7 @@ Drupal.jPlayer.authorize = function(wrapper, player) {
         $('#jplayer-message').fadeOut('fast');
       }
     },
-    async: false,
+    async: false
   });
   return false;
 };
