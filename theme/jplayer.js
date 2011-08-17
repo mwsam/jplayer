@@ -13,14 +13,14 @@ Drupal.behaviors.jPlayer = function(context) {
     var wrapper = $(this).parent().get(0);
     var player = this;
     var playerId = this.id;
-    var playerType = $(this).attr('rel') ? 'single' : 'playlist';
+    player.playerType = $(this).attr('rel') ? 'single' : 'playlist';
     var playerPlayTime = $(wrapper).find('.jp-play-time').get(0);
     var playerTotalTime = $(wrapper).find('.jp-total-time').get(0);
     var active = 0; // The current playlist item.
     var playlist = []; // An array of DOM element links.
 
     // Multi-player specific code.
-    if (playerType == 'playlist') {
+    if (player.playerType == 'playlist') {
 
       // Enable clicking links within the playlist.
       $(wrapper).find('.jp-playlist li a').each(function(n) {
@@ -75,7 +75,7 @@ Drupal.behaviors.jPlayer = function(context) {
       Drupal.jPlayer.pauseOthers(wrapper, player);
 
       // Handle pinging the authorization URL if needed.
-      if (playerType != 'playlist' && Drupal.settings.jPlayer.protected) {
+      if (player.playerType != 'playlist' && Drupal.settings.jPlayer.protected) {
         Drupal.jPlayer.authorize(wrapper, player);
         return false;
       }
@@ -118,7 +118,7 @@ Drupal.behaviors.jPlayer = function(context) {
       }
     })
     .jPlayer('onSoundComplete', function() {
-      if (playerType == 'playlist') {
+      if (player.playerType == 'playlist') {
         Drupal.jPlayer.next(wrapper, player, playlist, active);
       }
     });
@@ -178,7 +178,19 @@ Drupal.jPlayer.previous = function(wrapper, player, playlist, current) {
 Drupal.jPlayer.authorize = function(wrapper, player) {
   // Generate the authorization URL to ping.
   var time = new Date();
-  var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + Drupal.jPlayer.base64Encode($(player).attr('rel')) + '/' + Drupal.jPlayer.base64Encode(parseInt(time.getTime() / 1000).toString());
+
+  var track = "";
+  if (player.playerType != 'playlist') {
+    // For a single track, it's easy to get the file to play.
+    track = $(player).attr('rel');
+  }
+  else {
+    // Get a reference to the current track using the <ul> list that is used
+    // for the jPlayer playlist.
+    track = $('#' + player.id + '-playlist .jplayer_playlist_current a').attr('href');
+  }
+
+  var authorize_url = Drupal.settings.basePath + 'jplayer/authorize/' + Drupal.jPlayer.base64Encode(track) + '/' + Drupal.jPlayer.base64Encode(parseInt(time.getTime() / 1000).toString());
 
   // Ping the authorization URL. We need to disable async so that this
   // command finishes before thisandler returns.
