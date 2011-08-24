@@ -66,7 +66,7 @@ Drupal.behaviors.jPlayer = function(context) {
     // Ensure that only one jPlayer can play per page when the regular player
     // is used.
     $(wrapper).find('a.jp-play').click(function() {
-      Drupal.jPlayer.playLock(wrapper, player);
+      Drupal.jPlayer.pauseOthers(wrapper, player);
     });
 
     // Actually initialize the player.
@@ -120,15 +120,15 @@ Drupal.jPlayer.setActive = function(wrapper, player, playlist, index) {
 /**
  * Prevent multiple players from playing at once.
  */
-Drupal.jPlayer.playLock = function(wrapper, player) {
-  if (Drupal.settings.jPlayer.lock && Drupal.jPlayer.currentPlayer != player) {
+Drupal.jPlayer.pauseOthers = function(wrapper, player) {
+  if (Drupal.settings.jPlayer.pauseOthers && Drupal.jPlayer.currentPlayer != player) {
     $(Drupal.jPlayer.currentPlayer).jPlayer('pause');
   }
   Drupal.jPlayer.currentPlayer = player;
 }
 
 Drupal.jPlayer.play = function(wrapper, player) {
-  Drupal.jPlayer.playLock(wrapper, player);
+  Drupal.jPlayer.pauseOthers(wrapper, player);
   $(player).jPlayer('play');
   Drupal.jPlayer.active = true;
 }
