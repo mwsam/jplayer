@@ -33,7 +33,7 @@ function jplayer_settings_form() {
 
   $form['options']['jplayer_pause_others'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Pause other jPlaysers'),
+    '#title' => t('Pause other jPlayers'),
     '#description' => t('Prevents multiple jPlayers from playing at once on a single page. If a second player is started, the current player is paused.'),
     '#default_value' => variable_get('jplayer_pause_others', FALSE),
   );
