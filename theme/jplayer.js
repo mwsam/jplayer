@@ -63,6 +63,12 @@ Drupal.behaviors.jPlayer = function(context) {
       });
     }
 
+    // Ensure that only one jPlayer can play per page when the regular player
+    // is used.
+    $(wrapper).find('a.jp-play').click(function() {
+      Drupal.jPlayer.playLock(wrapper, player);
+    });
+
     // Actually initialize the player.
     $(player).jPlayer({
       ready: function() { 
@@ -111,7 +117,18 @@ Drupal.jPlayer.setActive = function(wrapper, player, playlist, index) {
   $(player).jPlayer('setFile', playlist[index].href);
 };
 
+/**
+ * Prevent multiple players from playing at once.
+ */
+Drupal.jPlayer.playLock = function(wrapper, player) {
+  if (Drupal.jPlayer.currentPlayer != player) {
+    $(Drupal.jPlayer.currentPlayer).jPlayer('pause');
+  }
+  Drupal.jPlayer.currentPlayer = player;
+}
+
 Drupal.jPlayer.play = function(wrapper, player) {
+  Drupal.jPlayer.playLock(wrapper, player);
   $(player).jPlayer('play');
   Drupal.jPlayer.active = true;
 }
