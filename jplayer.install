@@ -32,4 +32,6 @@ function jplayer_requirements($phase) {
  */
 function jplayer_uninstall() {
   //variable_del('jplayer_compression_type');
+  variable_del('jplayer_lock');
 }
+

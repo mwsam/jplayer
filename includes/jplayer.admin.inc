@@ -31,6 +31,13 @@ function jplayer_settings_form() {
     '#default_value' => variable_get('jplayer_autoplay', ''),
   );
 
+  $form['options']['jplayer_lock'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Only allow one player to be playing at a time'),
+    '#description' => t('Prevents multiple jPlayers from playing at once on a single page. If a second player is started, the current player is paused.'),
+    '#default_value' => variable_get('jplayer_lock', FALSE),
+  );
+
   $form = system_settings_form($form);
   $form['#validate'][] = 'jplayer_settings_form_validate';
   $form['#submit'][] = 'jplayer_settings_form_submit';

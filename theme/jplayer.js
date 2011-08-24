@@ -121,7 +121,7 @@ Drupal.jPlayer.setActive = function(wrapper, player, playlist, index) {
  * Prevent multiple players from playing at once.
  */
 Drupal.jPlayer.playLock = function(wrapper, player) {
-  if (Drupal.jPlayer.currentPlayer != player) {
+  if (Drupal.settings.jPlayer.lock && Drupal.jPlayer.currentPlayer != player) {
     $(Drupal.jPlayer.currentPlayer).jPlayer('pause');
   }
   Drupal.jPlayer.currentPlayer = player;
