@@ -31,12 +31,20 @@ function jplayer_menu() {
  */
 function jplayer_theme() {
   return array(
-    'jplayer_formatter_jplayer_single' => array(
+    'jplayer_formatter_single' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'includes/jplayer.theme.inc',
+    ),
+    'jplayer_single' => array(
       'arguments' => array('element' => NULL),
       'template' => 'theme/jplayer',
       'file' => 'includes/jplayer.theme.inc',
     ),
-    'jplayer_formatter_jplayer_playlist' => array(
+    'jplayer_formatter_playlist' => array(
+      'arguments' => array('element' => NULL),
+      'file' => 'includes/jplayer.theme.inc',
+    ),
+    'jplayer_playlist' => array(
       'arguments' => array('element' => NULL),
       'template' => 'theme/jplayer',
       'file' => 'includes/jplayer.theme.inc',
@@ -64,13 +72,13 @@ function jplayer_views_api() {
  */
 function jplayer_field_formatter_info() {
   return array(
-    'jplayer_single' => array(
+    'single' => array(
       'label' => t('jPlayer player'),
       'field types' => array('filefield', 'audiofield'),
       'multiple values' => CONTENT_HANDLE_CORE,
       'description' => t('Display an audio file as an HTML5-compatible with Flash-fallback audio player.'),
     ),
-    'jplayer_playlist' => array(
+    'playlist' => array(
       'label' => t('jPlayer multifile playlist'),
       'field types' => array('filefield', 'audiofield'),
       'multiple values' => CONTENT_HANDLE_MULTIPLE,
@@ -101,8 +109,8 @@ function jplayer_add($add = TRUE) {
   }
 
   if (isset($filepath)) {
-    $jplayer_js = drupal_get_path('module', 'jplayer') . '/theme/jplayer.js';
-    $jplayer_css = drupal_get_path('module', 'jplayer') . '/theme/jplayer.css';
+    $jplayer_js = jplayer_get_file_path('jplayer.js');    
+    $jplayer_css = jplayer_get_file_path('jplayer.css'); 
     $settings = array('jPlayer' => array(
       'swfPath' => base_path() . variable_get('jplayer_directory', 'sites/all/libraries/jplayer'),
       'autoPlay' => (int) variable_get('jplayer_autoplay', ''),
@@ -129,6 +137,30 @@ function jplayer_add($add = TRUE) {
   }
 
   return $return;
+}
+
+/**
+ * Returns path to the most appropriate file 
+ *
+ * @param $filename
+ *   Name of the file to find
+ * @param $required_files
+ *   Other files required in target folder
+ */
+function jplayer_get_file_path($filename, $required_files = array()) {
+  global $theme;
+  $theme_dir = drupal_get_path('theme', $theme) . '/jplayer/';
+  $found = false;
+  if (file_exists($path = $theme_dir . $filename)) {
+    $found = true;
+    foreach ($required_files as $key => $value) {
+      if (!file_exists($theme_dir . $value)) {
+        $found = false;
+        break;
+      }
+    }
+  }
+  return $found ? $path : (drupal_get_path('module', 'jplayer') . '/theme/' . $filename);
 }
 
 /**
