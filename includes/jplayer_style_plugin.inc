@@ -92,14 +92,15 @@ class jplayer_style_plugin extends views_plugin_style {
           }
         }
 
+        // Get the file path from the file object.
         $file = db_fetch_object(db_query("SELECT filepath FROM {files} WHERE fid = %d", $fileid));
         $filepath = $file->filepath;
+
         $this->view->row_index = $row_index;
         $label = trim(strip_tags($this->row_plugin->render($row)));
         if (empty($label)) {
           $label = basename($filepath);
         }
-        // get the file path from the file object
 
         $items[] = array(
           'url' => file_create_url($filepath),
