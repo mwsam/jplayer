@@ -72,9 +72,10 @@ function template_preprocess_jplayer_playlist(&$vars) {
  * Preprocess function for jplayer.tpl.php when displaying a view as a playlist.
  */
 function template_preprocess_jplayer_view_playlist(&$vars) {
-  if (!$vars['element']['#item']['fid'])
+  if (empty($vars['items'])) {
     return;
-    
+  }
+
   jplayer_add();
 
   $count = count($vars['items']);
