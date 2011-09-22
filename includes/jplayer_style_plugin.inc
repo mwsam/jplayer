@@ -84,18 +84,22 @@ class jplayer_style_plugin extends views_plugin_style {
     foreach ($sets as $title => $records) {
       foreach ($records as $row_index => $row) {
         $filepath = NULL;
+        $fileid = NULL;
         foreach ($this->options['path_field'] as $field_name) {
           if (isset($row->{$fields[$field_name]->field_alias})) {
-            $filepath = $row->{$fields[$field_name]->field_alias};
+            $fileid = $row->{$fields[$field_name]->field_alias};
             break;
           }
         }
 
+        $file = db_fetch_object(db_query("SELECT filepath FROM {files} WHERE fid = %d", $fileid));
+        $filepath = $file->filepath;
         $this->view->row_index = $row_index;
         $label = trim(strip_tags($this->row_plugin->render($row)));
         if (empty($label)) {
           $label = basename($filepath);
         }
+        // get the file path from the file object
 
         $items[] = array(
           'url' => file_create_url($filepath),
