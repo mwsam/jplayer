@@ -34,7 +34,9 @@ function template_preprocess_jplayer_single(&$vars) {
 function theme_jplayer_formatter_playlist($element) {
   if ($element[0]['#item']['fid']) {
     jplayer_add();
-    if (isset($element[1])) { // There's more than one file
+    // If there's more than one file, use the playlist player. Otherwise, fall
+    // back to the regular player.
+    if (isset($element[1])) {
       return theme('jplayer_playlist', $element);
     }
     $element += $element[0];
