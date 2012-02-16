@@ -79,7 +79,7 @@ Drupal.behaviors.jPlayer = function(context) {
         Drupal.jPlayer.authorize(wrapper, player);
         return false;
       }
-    }
+    });
 
     // Actually initialize the player.
     $(player).jPlayer({
@@ -140,7 +140,7 @@ Drupal.jPlayer.pauseOthers = function(wrapper, player) {
     $(Drupal.jPlayer.currentPlayer).jPlayer('pause');
   }
   Drupal.jPlayer.currentPlayer = player;
-}
+};
 
 Drupal.jPlayer.play = function(wrapper, player) {
   Drupal.jPlayer.pauseOthers(wrapper, player);
