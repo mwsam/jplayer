@@ -201,11 +201,11 @@ function jplayer_sort_files($raw_files = array(), $player_id = '', $type = 'sing
     // Add file into correct group.
     if (in_array($item['ext'], $video_extensions)) {
       $videos = TRUE;
-      $item['type'] = 'audio';
+      $item['type'] = 'video';
     }
     elseif (in_array($item['ext'], $audio_extensions)) {
       $audio = TRUE;
-      $item['type'] = 'video';
+      $item['type'] = 'audio';
     }
     elseif (in_array($item['ext'], $poster_extensions)) {
       $poster = $item['url'];
