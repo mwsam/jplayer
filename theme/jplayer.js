@@ -14,14 +14,14 @@ Drupal.behaviors.jPlayer = function(context) {
     var player = this;
     var playerId = this.id;
     player.playerType = $(this).attr('rel') ? 'single' : 'playlist';
-    var playerPlayTime = $(wrapper).find('.jp-play-time').get(0);
-    var playerTotalTime = $(wrapper).find('.jp-total-time').get(0);
+    var playerCurrentTime = $(wrapper).find('.jp-current-time').get(0);
+    var playerDuration = $(wrapper).find('.jp-duration').get(0);
     var active = 0; // The current playlist item.
     var playlist = []; // An array of DOM element links.
+    var playerSettings = Drupal.settings.jplayerInstances[playerId];
 
     // Multi-player specific code.
     if (player.playerType == 'playlist') {
-
       // Enable clicking links within the playlist.
       $(wrapper).find('.jp-playlist li a').each(function(n) {
         if ($(player).attr('rel') == '' || $(player).attr('rel') == undefined) {
@@ -37,23 +37,6 @@ Drupal.behaviors.jPlayer = function(context) {
           Drupal.jPlayer.play(wrapper, player);
           return false;
         });
-      });
-
-      // Enable play, pause, and stop buttons.
-      $(wrapper).find('a.jp-play').click(function() {
-        if (Drupal.settings.jPlayer.protected) {
-          Drupal.jPlayer.authorize(wrapper, player);
-        }
-        Drupal.jPlayer.play(wrapper, player);
-        return false;
-      });
-      $(wrapper).find('a.jp-pause').click(function() {
-        Drupal.jPlayer.pause(wrapper, player);
-        return false;
-      });
-      $(wrapper).find('a.jp-stop').click(function() {
-        Drupal.jPlayer.stop(wrapper, player);
-        return false;
       });
 
       // Enable next and previous buttons.
@@ -75,16 +58,16 @@ Drupal.behaviors.jPlayer = function(context) {
       Drupal.jPlayer.pauseOthers(wrapper, player);
 
       // Handle pinging the authorization URL if needed.
-      if (player.playerType != 'playlist' && Drupal.settings.jPlayer.protected) {
+      if (Drupal.settings.jPlayer.protected) {
         Drupal.jPlayer.authorize(wrapper, player);
-        return false;
       }
+      return false;
     });
 
     // Actually initialize the player.
     $(player).jPlayer({
-      ready: function() { 
-        this.element.jPlayer('setFile', this.element.attr('rel'));
+      ready: function() {
+        $(this).jPlayer('setMedia', playerSettings.files[active]);
         if (player.playerType == 'playlist') {
           Drupal.jPlayer.setActive(wrapper, player, playlist, active);
         }
@@ -96,40 +79,25 @@ Drupal.behaviors.jPlayer = function(context) {
         }
       },
       swfPath: Drupal.settings.jPlayer.swfPath,
-      volume: 50,
-      oggSupport: false,
-      nativeSupport: true
-    })
-    // Set all our custom IDs.
-    .jPlayer('cssId', 'play', playerId + '-play')
-    .jPlayer('cssId', 'pause', playerId + '-pause')
-    .jPlayer('cssId', 'stop', playerId + '-stop')
-    .jPlayer('cssId', 'loadBar', playerId + '-load-bar')
-    .jPlayer('cssId', 'playBar', playerId + '-play-bar')
-    .jPlayer('cssId', 'volumeMin', playerId + '-volume-min')
-    .jPlayer('cssId', 'volumeMax', playerId + '-volume-max')
-    .jPlayer('cssId', 'volumeBar', playerId + '-volume-bar')
-    .jPlayer('cssId', 'volumeBarValue', playerId + '-volume-bar-value')
-    // Register progress functions.
-    .jPlayer('onProgressChange', function(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime) {
-      $(playerPlayTime).text($.jPlayer.convertTime(playedTime));
-      if (totalTime != 0 && totalTime != Number.POSITIVE_INFINITY) {
-        $(playerTotalTime).text($.jPlayer.convertTime(totalTime));
-      }
-    })
-    .jPlayer('onSoundComplete', function() {
-      if (player.playerType == 'playlist') {
-        Drupal.jPlayer.next(wrapper, player, playlist, active);
-      }
+      supplied: playerSettings.supplied,
+      cssSelectorAncestor: '#' + playerId + '-interface',
+      ended: function (e) {
+        if ((player.playerType == 'playlist') && (active + 1 < playlist.length)) {
+          active = Drupal.jPlayer.next(wrapper, player, playlist, active);
+        }
+      },
     });
     $.jPlayer.timeFormat.showHour = true;
   });
 };
 
 Drupal.jPlayer.setActive = function(wrapper, player, playlist, index) {
+  var playerId = $(player).attr('id');
+  var playerSettings = Drupal.settings.jplayerInstances[playerId];
+
   $(wrapper).find('.jplayer_playlist_current').removeClass('jplayer_playlist_current');
   $(playlist[index]).parent().addClass('jplayer_playlist_current');
-  $(player).jPlayer('setFile', playlist[index].href);
+  $(player).jPlayer('setMedia', playerSettings.files[index]);
 };
 
 /**
@@ -146,16 +114,6 @@ Drupal.jPlayer.play = function(wrapper, player) {
   Drupal.jPlayer.pauseOthers(wrapper, player);
   $(player).jPlayer('play');
   Drupal.jPlayer.active = true;
-};
-
-Drupal.jPlayer.pause = function(wrapper, player) {
-  $(player).jPlayer('pause');
-  Drupal.jPlayer.active = false;
-};
-
-Drupal.jPlayer.stop = function(wrapper, player) {
-  $(player).jPlayer('stop');
-  Drupal.jPlayer.active = false;
 };
 
 Drupal.jPlayer.next = function(wrapper, player, playlist, current) {

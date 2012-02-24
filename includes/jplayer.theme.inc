@@ -25,7 +25,17 @@ function template_preprocess_jplayer_single(&$vars) {
     'label' => !empty($vars['element']['#item']['data']['description']) ? $vars['element']['#item']['data']['description'] : $vars['element']['#item']['filename'],
   );
   $vars['player_id'] = _jplayer_check_id('jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']) . '-' . $vars['element']['#item']['#delta']);
-
+  $player = jplayer_sort_files(array($vars['item']), $vars['player_id'], $vars['mode']);
+  $vars['type'] = $player['type'];
+  $player = array(
+    'jplayerInstances' => array(
+      $vars['player_id'] => array(
+        'files' => $player['files'],
+        'supplied' => $player['extensions'],
+      ),
+    ),
+  );
+  drupal_add_js($player, 'setting');
 }
 
 /**
@@ -73,6 +83,17 @@ function template_preprocess_jplayer_playlist(&$vars) {
   }
 
   $vars['player_id'] = _jplayer_check_id('jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']));
+  $player = jplayer_sort_files($vars['items'], $vars['player_id'], $vars['mode']);
+  $vars['type'] = $player['type'];
+  $player = array(
+    'jplayerInstances' => array(
+      $vars['player_id'] => array(
+        'files' => $player['files'],
+        'supplied' => $player['extensions'],
+      ),
+    ),
+  );
+  drupal_add_js($player, 'setting');
 }
 
 /**
@@ -137,3 +158,100 @@ function _jplayer_check_id($id) {
   return $id;
 }
 
+/**
+ * Filters an array of files into groups ready for jPlayer.
+ */
+function jplayer_sort_files($raw_files = array(), $player_id = '', $type = 'single') {
+  $video_extensions = array('m4v', 'mp4', 'ogv', 'webmv');
+  $audio_extensions = array('mp3', 'm4a', 'oga', 'webma', 'wav');
+  $poster_extensions = array('jpg', 'jpeg', 'png', 'gif');
+
+  $poster = NULL;
+  $videos = FALSE;
+  $audio = FALSE;
+  $media = array();
+
+  $files = array();
+  $extensions = array();
+  $playlist = array();
+
+  // Look through all the files provided and see what we have.
+  foreach ($raw_files as $delta => $item) {
+    // Get file URL.
+    if (!isset($item['url'])) {
+      $item['url'] = file_create_url($item['uri']);
+    }
+
+    // Get file extension.
+    if (!isset($item['ext'])) {
+      $fileinfo = pathinfo($item['url']);
+      $item['ext'] = $fileinfo['extension'];
+    }
+
+    // Get file label.
+    if (!isset($item['label'])) {
+      if (empty($item['description'])) {
+        $item['label'] = $item['filename'];
+      }
+      else {
+        $item['label'] = $item['description'];
+      }
+    }
+
+    // Add file into correct group.
+    if (in_array($item['ext'], $video_extensions)) {
+      $videos = TRUE;
+      $item['type'] = 'audio';
+    }
+    elseif (in_array($item['ext'], $audio_extensions)) {
+      $audio = TRUE;
+      $item['type'] = 'video';
+    }
+    elseif (in_array($item['ext'], $poster_extensions)) {
+      $poster = $item['url'];
+      $item['type'] = 'poster';
+    }
+
+    $media[] = $item;
+  }
+
+  $num = 0;
+  foreach ($media as $file) {
+    if ($videos == TRUE && $type != 'playlist') {
+      if ($file['type'] == 'audio') {
+        unset($file);
+      }
+      $player_type = 'video';
+    }
+    elseif ($videos == TRUE && $type == 'playlist') {
+      $player_type = 'video';
+    }
+    else {
+      $player_type = 'audio';
+    }
+
+    if (isset($file) && $file['type'] == 'audio') {
+      $files[][$file['ext']] = $file['url'];
+      $extensions[] = $file['ext'];
+      $playlist[] = l($file['label'], $file['url'], array('attributes' => array('id' => $player_id . '_item_' . $num, 'tabindex' => 1)));
+      $num++;
+    }
+    elseif (isset($file) && $file['type'] == 'video') {
+      $files[][$file['ext']] = $file['url'];
+      if ($poster != NULL) {
+        $files[]['poster'] = $poster;
+      }
+      $extensions[] = $file['ext'];
+      $playlist[] = l($file['label'], $file['url'], array('attributes' => array('id' => $player_id . '_item_' . $num, 'tabindex' => 1)));
+      $num++;
+    }
+  }
+
+  if ($type == 'single') {
+    $item = array_shift($playlist);
+    $playlist = array();
+    $playlist[] = $item;
+  }
+
+  return array('files' => $files, 'extensions' => implode(',', $extensions), 'playlist' => $playlist, 'type' => $player_type);
+}

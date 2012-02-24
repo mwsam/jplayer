@@ -116,7 +116,7 @@ div.jp-single-player div.jp-progress {
 div.jp-playlist-player div.jp-progress {
   left: 164px;
 }
-div.jp-load-bar {
+div.jp-seek-bar {
   background: url(jplayer.jpg) 0 -202px repeat-x;
   width: 0px;
   height: 15px;
@@ -127,21 +127,56 @@ div.jp-play-bar {
   width: 0px;
   height: 15px;
 }
-a.jp-volume-min {
-  top: 32px;
-  background: url(jplayer.jpg) 0 -170px no-repeat;
-  width: 18px;
-  height: 15px;
+
+a.jp-mute,
+a.jp-unmute {
+	width:18px;
+	height:15px;
 }
-div.jp-single-player a.jp-volume-min {
-  left: 274px;
+div.jp-audio div.jp-single-player a.jp-mute,
+div.jp-audio div.jp-single-player a.jp-unmute {
+	top:32px;
+	left:274px;
 }
-div.jp-playlist-player a.jp-volume-min {
-  left: 296px;
+div.jp-audio div.jp-playlist-player a.jp-mute,
+div.jp-audio div.jp-playlist-player a.jp-unmute {
+	top:32px;
+	left:296px;
 }
-a.jp-volume-min:hover {
-  background: url(jplayer.jpg) -19px -170px no-repeat;
+div.jp-video a.jp-mute,
+div.jp-video a.jp-unmute {
+	top:27px;
 }
+div.jp-video-270p div.jp-single-player a.jp-mute,
+div.jp-video-270p div.jp-single-player a.jp-unmute {
+	left:304px;
+}
+div.jp-video-270p div.jp-playlist-player a.jp-unmute,
+div.jp-video-270p div.jp-playlist-player a.jp-mute {
+	left:363px;
+}
+div.jp-video-360p div.jp-single-player a.jp-mute,
+div.jp-video-360p div.jp-single-player a.jp-unmute {
+	left:384px;
+}
+div.jp-video-360p div.jp-playlist-player a.jp-mute,
+div.jp-video-360p div.jp-playlist-player a.jp-unmute {
+	left:443px;
+}
+a.jp-mute {
+	background: url("jplayer.jpg") 0 -186px no-repeat;
+}
+a.jp-mute:hover {
+	background: url("jplayer.jpg") -19px -170px no-repeat;
+}
+a.jp-unmute {
+	background: url("jplayer.jpg") 0 -170px no-repeat;
+	display: none;
+}
+a.jp-unmute:hover {
+	background: url("jplayer.jpg") -19px -186px no-repeat;
+}
+
 a.jp-volume-max {
   top: 32px;
   background: url(jplayer.jpg) 0 -186px no-repeat;
@@ -178,23 +213,23 @@ div.jp-volume-bar-value {
   width: 0px;
   height: 5px;
 }
-div.jp-play-time,
-div.jp-total-time {
+div.jp-current-time,
+div.jp-duration {
   position: absolute;
   top: 49px;
   width: 122px;
   font-size: .64em;
   font-style: oblique;
 }
-div.jp-total-time {
+div.jp-duration {
   text-align: right;
 }
-div.jp-single-player div.jp-play-time,
-div.jp-single-player div.jp-total-time {
+div.jp-single-player div.jp-current-time,
+div.jp-single-player div.jp-duration {
   left: 130px;
 }
-div.jp-playlist-player div.jp-play-time,
-div.jp-playlist-player div.jp-total-time {
+div.jp-playlist-player div.jp-current-time,
+div.jp-playlist-player div.jp-duration {
   left: 164px;
 }
 div.jp-playlist {
