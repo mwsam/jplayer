@@ -208,6 +208,15 @@ function jplayer_theme() {
       'template' => 'theme/jplayer',
       'file' => 'includes/jplayer.theme.inc',
     ),
+    'jplayer_item_list' => array(
+      'arguments' => array(
+        'items' => array(),
+        'title' => NULL,
+        'type' => 'ul',
+        'attributes' => array(),
+      ),
+      'file' => 'includes/jplayer.theme.inc',
+    ),
   );
 }
 

@@ -26,11 +26,13 @@ function template_preprocess_jplayer_single(&$vars) {
   );
   $vars['player_id'] = _jplayer_check_id('jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']) . '-' . $vars['element']['#item']['#delta']);
   $player = jplayer_sort_files(array($vars['item']), $vars['player_id'], $vars['mode']);
+  $vars['playlist'] = theme('jplayer_item_list', $player['playlist']);
   $vars['type'] = $player['type'];
   $player = array(
     'jplayerInstances' => array(
       $vars['player_id'] => array(
         'files' => $player['files'],
+        'autoplay' => (int) variable_get('jplayer_autoplay', ''),
         'supplied' => $player['extensions'],
       ),
     ),
@@ -84,11 +86,13 @@ function template_preprocess_jplayer_playlist(&$vars) {
 
   $vars['player_id'] = _jplayer_check_id('jplayer-' . $vars['element']['#node']->nid . '-' . str_replace('_', '-', $vars['element']['#field_name']));
   $player = jplayer_sort_files($vars['items'], $vars['player_id'], $vars['mode']);
+  $vars['playlist'] = theme('jplayer_item_list', $player['playlist']);
   $vars['type'] = $player['type'];
   $player = array(
     'jplayerInstances' => array(
       $vars['player_id'] => array(
         'files' => $player['files'],
+        'autoplay' => (int) variable_get('jplayer_autoplay', ''),
         'supplied' => $player['extensions'],
       ),
     ),
@@ -122,6 +126,19 @@ function template_preprocess_jplayer_view_playlist(&$vars) {
 
   $vars['mode'] = 'playlist';
   $vars['player_id'] = _jplayer_check_id('jplayer-view-' . str_replace('_', '-', $vars['view']->name));
+  $player = jplayer_sort_files($vars['items'], $vars['player_id'], $vars['mode']);
+  $vars['playlist'] = theme('jplayer_item_list', $player['playlist']);
+  $vars['type'] = $player['type'];
+  $player = array(
+    'jplayerInstances' => array(
+      $vars['player_id'] => array(
+        'files' => $player['files'],
+        'autoplay' => (int) variable_get('jplayer_autoplay', ''),
+        'supplied' => $player['extensions'],
+      ),
+    ),
+  );
+  drupal_add_js($player, 'setting');
 }
 
 /**
@@ -156,6 +173,56 @@ function _jplayer_check_id($id) {
   }
 
   return $id;
+}
+
+/**
+ * Modified version of theme_item_list().
+ */
+function theme_jplayer_item_list($items, $title = NULL, $type = 'ul', $attributes = array()) {
+  $output = '';
+  if (isset($title)) {
+    $output .= '<h3>' . $title . '</h3>';
+  }
+
+  if (!empty($items)) {
+    $output .= "<$type" . drupal_attributes($attributes) . '>';
+    $num_items = count($items);
+    foreach ($items as $i => $item) {
+      $attributes = array();
+      $children = array();
+      if (is_array($item)) {
+        foreach ($item as $key => $value) {
+          if ($key == 'data') {
+            $data = $value;
+          }
+          elseif ($key == 'children') {
+            $children = $value;
+          }
+          else {
+            $attributes[$key] = $value;
+          }
+        }
+      }
+      else {
+        $data = $item;
+      }
+      if (count($children) > 0) {
+        $data .= theme_item_list($children, NULL, $type, $attributes); // Render nested list
+      }
+      if ($i == 0) {
+        $attributes['class'] = empty($attributes['class']) ? 'first' : ($attributes['class'] . ' first');
+        $attributes['class'] .= ' jp-playlist-first';
+      }
+      if ($i == $num_items - 1) {
+        $attributes['class'] = empty($attributes['class']) ? 'last' : ($attributes['class'] . ' last');
+        $attributes['class'] .= ' jp-playlist-last';
+      }
+      $output .= '<li' . drupal_attributes($attributes) . '>' . $data . "</li>\n";
+    }
+    $output .= "</$type>";
+  }
+  $output .= '</div>';
+  return $output;
 }
 
 /**
