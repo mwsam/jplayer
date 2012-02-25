@@ -9,7 +9,7 @@
   
   Drupal.behaviors.jPlayer = function(context) {
     // Set time format settings
-    /*$.jPlayer.timeFormat.showHour = Drupal.settings.jPlayer.showHour;
+    $.jPlayer.timeFormat.showHour = Drupal.settings.jPlayer.showHour;
     $.jPlayer.timeFormat.showMin = Drupal.settings.jPlayer.showMin;
     $.jPlayer.timeFormat.showSec = Drupal.settings.jPlayer.showSec;
     
@@ -19,7 +19,7 @@
     
     $.jPlayer.timeFormat.sepHour = Drupal.settings.jPlayer.sepHour;
     $.jPlayer.timeFormat.sepMin = Drupal.settings.jPlayer.sepMin;
-    $.jPlayer.timeFormat.sepSec = Drupal.settings.jPlayer.sepSec;*/
+    $.jPlayer.timeFormat.sepSec = Drupal.settings.jPlayer.sepSec;
     
     // INITIALISE
     

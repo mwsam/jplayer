@@ -56,6 +56,94 @@ function jplayer_settings_form() {
     '#description' => t('The number of seconds that a client will have access to download a protected file after it is requested by jPlayer.'),
   );
 
+  $form['timeformat'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Time Format'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form['timeformat']['jplayer_showHour'] = array(
+    '#title' => t('Display hours'),
+    '#type' => 'select',
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('jplayer_showHour', FALSE),
+  );
+
+  $form['timeformat']['jplayer_showMin'] = array(
+    '#title' => t('Display minutes'),
+    '#type' => 'select',
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('jplayer_showMin', TRUE),
+  );
+
+  $form['timeformat']['jplayer_showSec'] = array(
+    '#title' => t('Display seconds'),
+    '#type' => 'select',
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('jplayer_showSec', TRUE),
+  );
+
+  $form['timeformat']['jplayer_padHour'] = array(
+    '#title' => t('Zero-pad the hours'),
+    '#type' => 'select',
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('jplayer_padHour', FALSE),
+  );
+
+  $form['timeformat']['jplayer_padMin'] = array(
+    '#title' => t('Zero-pad the minutes'),
+    '#type' => 'select',
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('jplayer_padMin', TRUE),
+  );
+
+  $form['timeformat']['jplayer_padSec'] = array(
+    '#title' => t('Zero-pad the seconds'),
+    '#type' => 'select',
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('jplayer_padSec', TRUE),
+  );
+
+  $form['timeformat']['jplayer_sepHour'] = array(
+    '#title' => t('Hours seperator'),
+    '#type' => 'textfield',
+    '#maxlength' => 32,
+    '#default_value' => variable_get('jplayer_sepHour', ':'),
+  );
+
+  $form['timeformat']['jplayer_sepMin'] = array(
+    '#title' => t('Minutes seperator'),
+    '#type' => 'textfield',
+    '#maxlength' => 32,
+    '#default_value' => variable_get('jplayer_sepMin', ':'),
+  );
+
+  $form['timeformat']['jplayer_sepSec'] = array(
+    '#title' => t('Seconds seperator'),
+    '#type' => 'textfield',
+    '#maxlength' => 32,
+    '#default_value' => variable_get('jplayer_sepSec', ''),
+  );
+
   $form = system_settings_form($form);
   $form['#validate'][] = 'jplayer_settings_form_validate';
   $form['#submit'][] = 'jplayer_settings_form_submit';

@@ -88,6 +88,15 @@ function jplayer_uninstall() {
   variable_del('jplayer_pause_others');
   variable_del('jplayer_protected');
   variable_del('jplayer_access_time');
+  variable_del('jplayer_showHour');
+  variable_del('jplayer_showMin');
+  variable_del('jplayer_showSec');
+  variable_del('jplayer_padHour');
+  variable_del('jplayer_padMin');
+  variable_del('jplayer_padSec');
+  variable_del('jplayer_sepHour');
+  variable_del('jplayer_sepMin');
+  variable_del('jplayer_sepSec');
 }
 
 /**
