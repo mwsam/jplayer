@@ -65,6 +65,7 @@ div.jp-interface ul.jp-controls {
 div.jp-interface ul.jp-controls li {
 	/* position: absolute; */
 	display:inline;
+	background: none;
 }
 div.jp-interface ul.jp-controls a {
 	position: absolute;
@@ -365,7 +366,9 @@ div.jp-playlist ul {
 	/* width:378px; */
 	font-size:.72em;
 }
-
+div.jp-playlist ul li {
+	background: none;
+}
 
 div.jp-type-single div.jp-playlist li {
 	padding:5px 0 5px 20px;
