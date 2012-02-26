@@ -64,11 +64,11 @@
           },
           swfPath: Drupal.settings.jPlayer.swfPath,
           cssSelectorAncestor: '#'+playerId+'_interface',
-          //solution: playerSettings.solution,
+          solution: playerSettings.solution,
           supplied: playerSettings.supplied,
-          //preload: playerSettings.preload,
-          //volume: playerSettings.volume,
-          //muted: playerSettings.muted
+          preload: playerSettings.preload,
+          volume: playerSettings.volume,
+          muted: playerSettings.muted
         });
       }
       else {
@@ -115,11 +115,11 @@
           },
           swfPath: Drupal.settings.jPlayer.swfPath,
           cssSelectorAncestor: '#'+playerId+'_interface',
-          //solution: playerSettings.solution,
+          solution: playerSettings.solution,
           supplied: playerSettings.supplied,
-          //preload: playerSettings.preload,
-          //volume: playerSettings.volume,
-          //muted: playerSettings.muted
+          preload: playerSettings.preload,
+          volume: playerSettings.volume,
+          muted: playerSettings.muted
         });
         
         // Next

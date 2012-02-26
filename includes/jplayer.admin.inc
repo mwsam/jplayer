@@ -24,6 +24,66 @@ function jplayer_settings_form() {
     '#collapsible' => FALSE,
   );
 
+  $form['options']['jplayer_solution'] = array(
+    '#type' => 'select',
+    '#title' => t('Preferred solution'),
+    '#options' => array(
+      'html, flash' => t('HTML5'),
+      'flash, html' => t('Flash'),
+    ),
+    '#default_value' => variable_get('jplayer_solution', 'html, flash'),
+  );
+
+  $form['options']['jplayer_preload'] = array(
+    '#type' => 'select',
+    '#title' => t('Preload media'),
+    '#options' => array(
+      'metadata' => t('No'),
+      'auto' => t('Yes'),
+    ),
+    '#description' => t("Preloading media before it's requested isn't available in all browsers."),
+    '#default_value' => variable_get('jplayer_preload', 'metadata'),
+  );
+
+  $form['options']['jplayer_volume'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Initial volume'),
+    '#field_suffix' => '%',
+    '#maxlength' => 3,
+    '#size' => 3,
+    '#default_value' => variable_get('jplayer_volume', 80),
+  );
+
+  $form['options']['jplayer_muted'] = array(
+    '#type' => 'select',
+    '#title' => t('Initially muted'),
+    '#options' => array(
+      FALSE => t('No'),
+      TRUE => t('Yes'),
+    ),
+    '#default_value' => variable_get('jplayer_muted', FALSE),
+  );
+
+  $form['options']['jplayer_repeat'] = array(
+    '#type' => 'select',
+    '#title' => t('Repeat'),
+    '#options' => array(
+      'all' => t('All'),
+      'single' => t('Single'),
+      'none' => t('None'),
+    ),
+    '#default_value' => variable_get('jplayer_repeat', 'none'),
+  );
+
+  $form['options']['jplayer_background_color'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Background color'),
+    '#field_prefix' => '#',
+    '#maxlength' => 6,
+    '#size' => 6,
+    '#default_value' => variable_get('jplayer_background_color', '000000'),
+  );
+
   $form['options']['jplayer_autoplay'] = array(
     '#type' => 'checkbox',
     '#title' => t('Auto-play files on page load'),
@@ -157,6 +217,11 @@ function jplayer_settings_form_validate($form, &$form_state) {
   $form_state['jplayer_version'] = jplayer_get_version($form_state['values']['jplayer_directory']);
   if (!$form_state['jplayer_version']) {
     form_error($form['jplayer_directory'], t('The directory specified does not seem to contain the jPlayer library. Check to make sure that the jquery.player.min.js file is located within this directory.'));
+  }
+
+  $volume = $form_state['values']['jplayer_volume'];
+  if ($volume < 0 || $volume > 100) {
+    form_error($form['options']['jplayer_volume'], t('Volume must be a percentage between 0% and 100%.'));
   }
 
   $time = $form_state['values']['jplayer_access_time'];

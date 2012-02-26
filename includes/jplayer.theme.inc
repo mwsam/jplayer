@@ -30,11 +30,7 @@ function template_preprocess_jplayer_single(&$vars) {
   $vars['type'] = $player['type'];
   $player = array(
     'jplayerInstances' => array(
-      $vars['player_id'] => array(
-        'files' => $player['files'],
-        'autoplay' => (int) variable_get('jplayer_autoplay', ''),
-        'supplied' => $player['extensions'],
-      ),
+      $vars['player_id'] => jplayer_get_instance_settings($player),
     ),
   );
   drupal_add_js($player, 'setting');
@@ -90,11 +86,7 @@ function template_preprocess_jplayer_playlist(&$vars) {
   $vars['type'] = $player['type'];
   $player = array(
     'jplayerInstances' => array(
-      $vars['player_id'] => array(
-        'files' => $player['files'],
-        'autoplay' => (int) variable_get('jplayer_autoplay', ''),
-        'supplied' => $player['extensions'],
-      ),
+      $vars['player_id'] => jplayer_get_instance_settings($player),
     ),
   );
   drupal_add_js($player, 'setting');
@@ -131,48 +123,10 @@ function template_preprocess_jplayer_view_playlist(&$vars) {
   $vars['type'] = $player['type'];
   $player = array(
     'jplayerInstances' => array(
-      $vars['player_id'] => array(
-        'files' => $player['files'],
-        'autoplay' => (int) variable_get('jplayer_autoplay', ''),
-        'supplied' => $player['extensions'],
-      ),
+      $vars['player_id'] => jplayer_get_instance_settings($player),
     ),
   );
   drupal_add_js($player, 'setting');
-}
-
-/**
- * Return a unique ID for a jPlayer. This allows multiple embedded jPlayers to
- * point to an identical file on the same page.
- *
- * @param $id
- *   The ID to check for uniqueness.
- *
- * @return
- *   A modified ID if the ID was not unique, or the same ID passed in if it was
- *   unique.
- */
-function _jplayer_check_id($id) {
-  // We keep track of player IDs generated per request. This ensures that if a
-  // player pointing to the same field is shown multiple times on a page, that
-  // each player gets a unique ID. This is especially a problem when jPlayers
-  // are embedded in hidden content such as View rendered with Quicktabs.
-  static $player_ids = array();
-
-  // Add the request time, so if the same player is inserted multiple times
-  // AJAX all players are functional.
-  $id = $id . '-' . $_SERVER['REQUEST_TIME'];
-
-  // Store a count of the number of times a unique ID is used, and make it
-  // unique if needed.
-  if (isset($player_ids[$id])) {
-    $id = $id . '-' . $player_ids[$id]++;
-  }
-  else {
-    $player_ids[$id] = 0;
-  }
-
-  return $id;
 }
 
 /**
@@ -321,4 +275,38 @@ function jplayer_sort_files($raw_files = array(), $player_id = '', $type = 'sing
   }
 
   return array('files' => $files, 'extensions' => implode(',', $extensions), 'playlist' => $playlist, 'type' => $player_type);
+}
+
+/**
+ * Return a unique ID for a jPlayer. This allows multiple embedded jPlayers to
+ * point to an identical file on the same page.
+ *
+ * @param $id
+ *   The ID to check for uniqueness.
+ *
+ * @return
+ *   A modified ID if the ID was not unique, or the same ID passed in if it was
+ *   unique.
+ */
+function _jplayer_check_id($id) {
+  // We keep track of player IDs generated per request. This ensures that if a
+  // player pointing to the same field is shown multiple times on a page, that
+  // each player gets a unique ID. This is especially a problem when jPlayers
+  // are embedded in hidden content such as View rendered with Quicktabs.
+  static $player_ids = array();
+
+  // Add the request time, so if the same player is inserted multiple times
+  // AJAX all players are functional.
+  $id = $id . '-' . $_SERVER['REQUEST_TIME'];
+
+  // Store a count of the number of times a unique ID is used, and make it
+  // unique if needed.
+  if (isset($player_ids[$id])) {
+    $id = $id . '-' . $player_ids[$id]++;
+  }
+  else {
+    $player_ids[$id] = 0;
+  }
+
+  return $id;
 }

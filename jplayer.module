@@ -314,6 +314,23 @@ function jplayer_add($add = TRUE) {
 }
 
 /**
+ * Return jplayer instance default settings.
+ */
+function jplayer_get_instance_settings($player) {
+  return array(
+    'files' => isset($player['files']) ? $player['files'] : array(),
+    'solution' => variable_get('jplayer_solution', 'html, flash'),
+    'supplied' => isset($player['extensions']) ? $player['extensions'] : '',
+    'preload' => variable_get('jplayer_preload', 'metadata'),
+    'volume' => ((int) variable_get('jplayer_volume', 80)) / 100,
+    'muted' => (boolean) variable_get('jplayer_muted', FALSE),
+    'autoplay' => (boolean) variable_get('jplayer_autoplay', ''),
+    'repeat' => variable_get('jplayer_repeat', 'none'),
+    'backgroundColor' => variable_get('jplayer_background_color', '000000'),
+  );
+}
+
+/**
  * Returns path to the most appropriate file 
  *
  * @param $filename

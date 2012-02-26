@@ -85,6 +85,14 @@ function jplayer_requirements($phase) {
  */
 function jplayer_uninstall() {
   drupal_uninstall_schema('jplayer');
+  variable_del('jplayer_directory');
+  variable_del('jplayer_solution');
+  variable_del('jplayer_preload');
+  variable_del('jplayer_volume');
+  variable_del('jplayer_muted');
+  variable_del('jplayer_repeat');
+  variable_del('jplayer_background_color');
+  variable_del('jplayer_autoplay');
   variable_del('jplayer_pause_others');
   variable_del('jplayer_protected');
   variable_del('jplayer_access_time');
